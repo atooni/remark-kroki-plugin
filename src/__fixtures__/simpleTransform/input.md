@@ -3,7 +3,7 @@
 
 Some Text 
 
-```kroki imgType="mermaid"
+```kroki imgType="mermaid" imgAlt="An image"
 graph TD
   subgraph Shop X
     Bx(Shop X) --> FX1((Fs X1)) --> Bx
