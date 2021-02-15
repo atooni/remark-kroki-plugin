@@ -64,6 +64,7 @@ The user can decide to put generated images under version control so that images
 
 __Generate a mermaid image__
 
+<pre>
 ```kroki imgType="mermaid" imgTitle="Collaborating containers"
 graph TD
   subgraph Shop X
@@ -82,6 +83,7 @@ graph TD
   A --> By --> A
   A --> Bz --> A
 ```
+</pre>
 
 ## Development 
 
