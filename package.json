@@ -1,6 +1,6 @@
 {
   "name": "remark-kroki-plugin",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Generate images from text using the kroki web service",
   "repository": "https://github.com/atooni/remark-kroki-plugin.git",
   "license": "Apache 2.0",
