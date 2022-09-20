@@ -15,6 +15,7 @@ The include code plugin is normally used in the context of a site generator usin
    1. __lang__: The image transformations is applied for all codeblocks with this language. 
    1. __imgRefDir__: The prefix that will be used for a generated image to create the link. 
    1. __imgDir__: The directory where the generated image files are stored.
+   1. __langAliases__: an array of markdown code languages that get treated as a kroki document ([See blow](#automatic-use-of-existing-language-tags))
 
 ### Docusaurus 2 
 
@@ -62,10 +63,63 @@ The user can decide to put generated images under version control so that images
 
 ### Examples
 
+#### Explicit kroki "language"
+
 __Generate a mermaid image__
 
 <pre>
 ```kroki imgType="mermaid" imgTitle="Collaborating containers"
+graph TD
+  subgraph Shop X
+    Bx(Shop X) --> FX1((Fs X1)) --> Bx
+    Bx --> FX2((Fs X2)) --> Bx
+  end
+  subgraph Shop Y
+    By(Shop Y) --> FY1((Fs Y1)) --> By
+    By --> FY2((Fs Y2)) --> By
+  end
+  subgraph Shop Z
+    Bz(Shop Z) --> FZ1((Fs Z1)) --> Bz
+    Bz --> FZ2((Fs Z2)) --> Bz
+  end
+  A(Data Center) --> Bx --> A
+  A --> By --> A
+  A --> Bz --> A
+```
+</pre>
+
+#### Automatic use of existing language tags
+
+In some cases, it would make a lot of sense to preserve the original language tag, for example `mermaid` documents are a first-class citizen in many markdown editors and is even explicitly supported inside popular code hosting services such as GitHub and GitLab.
+
+In such cases, in would make sense to supply the optional `langAliases` option as part of the kroki plugin setup like so, to avoid rewriting the language tag for existing code-blocks that work well in other environments not related to remark/kroki:
+
+```json
+  presets: [[
+      '@docusaurus/preset-classic',
+      {
+        docs: {
+          sidebarPath: require.resolve('./sidebars.js'),
+          remarkPlugins: [
+            [ 
+              require('remark-kroki-plugin'),
+              {
+                krokiBase: 'https://kroki.io',
+                lang: "kroki",
+                langAliases: ["mermaid"],
+                imgRefDir: "../img/kroki",
+                imgDir: "static/img/kroki"
+              }
+            ]
+          ],
+        }}
+    ]]
+```
+
+This in turn allows for direct inclusing of mermaid blocks in a more straight-forward manner:
+
+<pre>
+```mermaid
 graph TD
   subgraph Shop X
     Bx(Shop X) --> FX1((Fs X1)) --> Bx

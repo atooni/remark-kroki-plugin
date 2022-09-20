@@ -9,7 +9,8 @@ export interface KrokiOptions {
   krokiBase: string,
   imgDir: string,
   imgRefDir: string,
-  lang: string
+  lang: string,
+  langAliases: string[]
 }
 
 function get<V>(v: (V | undefined)): V {
@@ -95,11 +96,13 @@ const applyCodeBlock = (options: KrokiOptions, node: any) => {
 
   let kb = undefined
 
-  if (lang === options.lang) {
+  let isAliasLang = options.langAliases != undefined && options.langAliases.includes(lang);
+
+  if (lang === options.lang || isAliasLang) {
 
     const imgAlt = extractParam("imgAlt", meta);
     const imgTitle = extractParam("imgTitle", meta);
-    const imgType = get(extractParam("imgType", meta));
+    const imgType = isAliasLang ? lang : get(extractParam("imgType", meta));
 
     kb = new ImageBlock(
       node,
