@@ -1,5 +1,7 @@
 import { Md5 } from 'ts-md5/dist/md5';
 import visit from 'unist-util-visit';
+import { Node, Code } from 'mdast'
+import { Position } from 'unist'
 import fetch from 'node-fetch';
 import fs from 'fs';
 
@@ -28,7 +30,8 @@ class ImageBlock {
     readonly imgType: string,
     readonly imgAlt: OptionString,
     readonly imgTitle: OptionString,
-    readonly imageCode: string
+    readonly imageCode: string,
+    readonly position: Position
   ) { }
 
   private md5 = Md5.hashStr(this.imageCode);
@@ -51,16 +54,15 @@ class ImageBlock {
     return response;
   }
 
-  createNode = async () => {
+  createNode = async (vfile: any) => {
 
     if (fs.existsSync(this.imgFile)) {
-      console.log("Reusing image file [" + this.imgFile + "].");
+      //console.log("Reusing image file [" + this.imgFile + "].");
     } else {
       const imgText = await this.getImage();
 
       if (!imgText.ok) {
-        throw new Error("Unable to get image text from kroki")
-      } else {
+        throw new Error(`Unable to get image text from kroki @ ${vfile.path}:${this.position.start.line}:${this.position.start.column}: ${this.imageCode}`)
         const svg = await imgText.text();
         fs.writeFileSync(this.imgFile, svg, "utf-8");
       }
@@ -92,7 +94,7 @@ export function extractParam(name: string, input: string): OptionString {
 }
 
 const applyCodeBlock = (options: KrokiOptions, node: any) => {
-  const { lang, meta, value } = node;
+  const { lang, meta, value, position } = node;
 
   let kb = undefined
 
@@ -110,14 +112,15 @@ const applyCodeBlock = (options: KrokiOptions, node: any) => {
       imgType,
       imgAlt,
       imgTitle,
-      value
+      value,
+      position
     )
   }
 
   return kb;
 }
 
-export const transform = (options: KrokiOptions) => (tree: any) => new Promise<void>(async (resolve) => {
+export const transform = (options: KrokiOptions) => (tree: any, vfile: any) => new Promise<void>(async (resolve) => {
 
   const nodesToChange: ImageBlock[] = [];
 
@@ -137,7 +140,7 @@ export const transform = (options: KrokiOptions) => (tree: any) => new Promise<v
 
   // Now go over the collected nodes and change them 
   for (const kb of nodesToChange) {
-    await kb.createNode()
+    await kb.createNode(vfile)
   }
 
   resolve();

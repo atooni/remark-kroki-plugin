@@ -1,6 +1,6 @@
 {
   "name": "remark-kroki-plugin",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Generate images from text using the kroki web service",
   "repository": "https://github.com/atooni/remark-kroki-plugin.git",
   "license": "Apache 2.0",
@@ -14,14 +14,15 @@
     "test": "jest --verbose --coverage"
   },
   "dependencies": {
-    "unist-util-visit": "2.0.3",
     "remark": "^13.0.0",
-    "ts-md5": "1.2.7"
+    "ts-md5": "1.2.7",
+    "unist-util-visit": "2.0.3"
   },
   "devDependencies": {
     "@babel/core": "7.11.6",
     "@babel/preset-env": "7.12.1",
     "@tsconfig/recommended": "^1.0.1",
+    "@types/mdast": "^4.0.3",
     "@types/node": "^14.14.22",
     "@types/node-fetch": "1.6.9",
     "dotenv": "8.2.0",

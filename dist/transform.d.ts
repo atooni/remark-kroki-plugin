@@ -1,4 +1,4 @@
-declare type OptionString = string | undefined;
+type OptionString = string | undefined;
 export interface KrokiOptions {
     krokiBase: string;
     imgDir: string;
@@ -7,5 +7,5 @@ export interface KrokiOptions {
     langAliases: string[];
 }
 export declare function extractParam(name: string, input: string): OptionString;
-export declare const transform: (options: KrokiOptions) => (tree: any) => Promise<void>;
+export declare const transform: (options: KrokiOptions) => (tree: any, vfile: any) => Promise<void>;
 export {};
