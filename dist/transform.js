@@ -40,22 +40,32 @@ class ImageBlock {
             process.cwd() + "/" + this.options.imgDir + "/" + this.md5 + ".svg";
         this.krokiUrl = this.options.krokiBase + "/" + this.imgType + "/svg";
         this.getImage = () => __awaiter(this, void 0, void 0, function* () {
-            const response = yield (0, node_fetch_1.default)(this.krokiUrl, {
+            if (this.options.verbose)
+                console.log("Fetching image from kroki @ " + this.krokiUrl + " ...");
+            const response = yield node_fetch_1.default(this.krokiUrl, {
                 method: 'POST',
                 body: this.imageCode,
                 headers: { 'Content-Type': 'text/plain' }
             });
+            if (this.options.verbose)
+                console.log(`Got response from kroki: ${response.status} ${response.statusText}`);
             return response;
         });
         this.createNode = (vfile) => __awaiter(this, void 0, void 0, function* () {
             if (fs_1.default.existsSync(this.imgFile)) {
-                //console.log("Reusing image file [" + this.imgFile + "].");
+                if (this.options.verbose)
+                    console.log("Reusing image file [" + this.imgFile + "].");
             }
             else {
                 const imgText = yield this.getImage();
                 if (!imgText.ok) {
                     throw new Error(`Unable to get image text from kroki @ ${vfile.path}:${this.position.start.line}:${this.position.start.column}: ${this.imageCode}`);
+                }
+                else {
                     const svg = yield imgText.text();
+                    if (this.options.verbose)
+                        console.log(`Writing image file [${this.imgFile}] with ${svg.length} bytes.`);
+                    ;
                     fs_1.default.writeFileSync(this.imgFile, svg, "utf-8");
                 }
             }
@@ -104,7 +114,7 @@ const transform = (options) => (tree, vfile) => new Promise((resolve) => __await
             nodesToChange.push(kb);
         }
     };
-    (0, unist_util_visit_1.default)(tree, 'code', visitor);
+    unist_util_visit_1.default(tree, 'code', visitor);
     // Now go over the collected nodes and change them 
     for (const kb of nodesToChange) {
         yield kb.createNode(vfile);

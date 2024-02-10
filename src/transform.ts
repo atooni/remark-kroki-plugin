@@ -13,6 +13,7 @@ export interface KrokiOptions {
   imgRefDir: string,
   lang: string,
   langAliases: string[]
+  verbose: boolean
 }
 
 function get<V>(v: (V | undefined)): V {
@@ -45,11 +46,17 @@ class ImageBlock {
 
   private getImage = async () => {
 
+    if (this.options.verbose)
+      console.log("Fetching image from kroki @ " + this.krokiUrl + " ...");
+
     const response = await fetch(this.krokiUrl, {
       method: 'POST',
       body: this.imageCode,
       headers: { 'Content-Type': 'text/plain' }
     });
+
+    if (this.options.verbose)
+      console.log(`Got response from kroki: ${response.status} ${response.statusText}`);
 
     return response;
   }
@@ -57,13 +64,17 @@ class ImageBlock {
   createNode = async (vfile: any) => {
 
     if (fs.existsSync(this.imgFile)) {
-      //console.log("Reusing image file [" + this.imgFile + "].");
+      if (this.options.verbose)
+        console.log("Reusing image file [" + this.imgFile + "].");
     } else {
       const imgText = await this.getImage();
 
       if (!imgText.ok) {
         throw new Error(`Unable to get image text from kroki @ ${vfile.path}:${this.position.start.line}:${this.position.start.column}: ${this.imageCode}`)
+      } else {
         const svg = await imgText.text();
+        if (this.options.verbose)
+          console.log(`Writing image file [${this.imgFile}] with ${svg.length} bytes.`);;
         fs.writeFileSync(this.imgFile, svg, "utf-8");
       }
     }
